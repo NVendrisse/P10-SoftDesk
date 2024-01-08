@@ -10,6 +10,7 @@ class Project(models.Model):
         IOS = "I", _("iOS")
         ANDROID = "A", _("Android")
 
+    author = models.ForeignKey(to=User, on_delete=models.DO_NOTHING)
     name = models.CharField(max_length=32)
     description = models.CharField(max_length=2048)
     type = models.CharField(max_length=10, choices=ProjectTypes.choices)
@@ -38,7 +39,7 @@ class Issue(models.Model):
         INP = "I", _("IN PROGRESS")
         FIN = "F", _("FINISHED")
 
-    user = models.ForeignKey(to=User, on_delete=models.CASCADE)
+    user = models.ForeignKey(to=User, on_delete=models.DO_NOTHING)
     project = models.ForeignKey(to=Project, on_delete=models.CASCADE)
     time_created = models.DateTimeField(auto_now_add=True)
     priority = models.CharField(max_length=1, choices=Priority.choices)
@@ -47,7 +48,7 @@ class Issue(models.Model):
 
 
 class Comment(models.Model):
-    user = models.ForeignKey(to=User, on_delete=models.CASCADE)
+    user = models.ForeignKey(to=User, on_delete=models.DO_NOTHING)
     issue = models.ForeignKey(to=Issue, on_delete=models.CASCADE)
     text = models.CharField(max_length=2048)
     time_created = models.DateTimeField(auto_now_add=True)

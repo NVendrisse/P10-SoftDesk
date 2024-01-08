@@ -16,10 +16,35 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from software.views import ProjectView
+from software.views import (
+    ProjectViewSet,
+    ContributorViewSet,
+    IssueViewSet,
+    CommentViewSet,
+)
+from authentification.views import UserViewSet
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_nested import routers
+
+router = routers.DefaultRouter()
+
+router.register("projects", ProjectViewSet, basename="projects")
+router.register("users", UserViewSet, basename="users")
+
+project_routers = routers.NestedSimpleRouter(router, r"projects", lookup="project")
+project_routers.register(r"contributors", ContributorViewSet, basename="contributors")
+project_routers.register(r"issues", IssueViewSet, basename="issues")
+
+issue_routers = routers.NestedSimpleRouter(project_routers, r"issues", lookup="issue")
+issue_routers.register(r"comment", CommentViewSet, basename="comments")
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api-auth/", include("rest_framework.urls")),
-    path("api/projects/", ProjectView.as_view()),
+    path("api/", include(router.urls)),
+    path("api/", include(project_routers.urls)),
+    path("api/", include(issue_routers.urls)),
+    path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 ]
