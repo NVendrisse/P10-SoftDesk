@@ -15,6 +15,9 @@ class Project(models.Model):
     description = models.CharField(max_length=2048)
     type = models.CharField(max_length=10, choices=ProjectTypes.choices)
     time_created = models.DateTimeField(auto_now_add=True)
+    contributors = models.ManyToManyField(
+        to=User, through="contributor", related_name="contributor_list", default=[]
+    )
 
 
 class Contributor(models.Model):
@@ -39,16 +42,21 @@ class Issue(models.Model):
         INP = "I", _("IN PROGRESS")
         FIN = "F", _("FINISHED")
 
-    user = models.ForeignKey(to=User, on_delete=models.DO_NOTHING)
+    author = models.ForeignKey(to=User, on_delete=models.DO_NOTHING)
     project = models.ForeignKey(to=Project, on_delete=models.CASCADE)
     time_created = models.DateTimeField(auto_now_add=True)
     priority = models.CharField(max_length=1, choices=Priority.choices)
     nature = models.CharField(max_length=1, choices=Nature.choices)
     status = models.CharField(max_length=1, choices=ProgressStatus.choices)
+    title = models.CharField(max_length=56)
+    description = models.CharField(max_length=1024)
+    attributed_user = models.ForeignKey(
+        to=User, on_delete=models.DO_NOTHING, related_name="attributed"
+    )
 
 
 class Comment(models.Model):
-    user = models.ForeignKey(to=User, on_delete=models.DO_NOTHING)
+    author = models.ForeignKey(to=User, on_delete=models.DO_NOTHING)
     issue = models.ForeignKey(to=Issue, on_delete=models.CASCADE)
     text = models.CharField(max_length=2048)
     time_created = models.DateTimeField(auto_now_add=True)

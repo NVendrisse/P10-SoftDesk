@@ -38,6 +38,13 @@ project_routers.register(r"issues", IssueViewSet, basename="issues")
 issue_routers = routers.NestedSimpleRouter(project_routers, r"issues", lookup="issue")
 issue_routers.register(r"comment", CommentViewSet, basename="comments")
 
+# DEBUG URLS
+# for url in router.urls:
+# print(url)
+# for url in project_routers.urls:
+# print(url)
+# for url in issue_routers.urls:
+# print(url)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
