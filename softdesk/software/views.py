@@ -8,10 +8,22 @@ from software.serializer import (
 )
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
-from .permissions import IsContributor, IsAuthor, IsProjectAuthorOrContributorReadOnly
+from .permissions import (
+    IsContributor,
+    IsAuthor,
+    IsProjectAuthorOrContributorReadOnly,
+    CanAddContributor,
+)
 
 
 class ProjectViewSet(ModelViewSet):
+    """
+    Projects view management
+    Override the get_queryset function in order to
+    view only the project where the user is the author or a contributor of it
+    And the perform_create function, which create the project and add the author to its contributors
+    """
+
     serializer_class = ProjectSerializer
     permission_classes = [IsAuthenticated, IsProjectAuthorOrContributorReadOnly]
 
@@ -32,7 +44,14 @@ class ProjectViewSet(ModelViewSet):
 
 class ContributorViewSet(ModelViewSet):
     serializer_class = ContributorSerializer
-    permission_classes = [IsAuthenticated, IsProjectAuthorOrContributorReadOnly]
+    permission_classes = [
+        IsAuthenticated,
+        IsProjectAuthorOrContributorReadOnly,
+        CanAddContributor,
+    ]
+    """
+    Simple class use to get and post new contributors
+    """
 
     def get_queryset(self):
         project_id = self.kwargs.get("project_pk")
@@ -47,7 +66,11 @@ class ContributorViewSet(ModelViewSet):
 
 class IssueViewSet(ModelViewSet):
     serializer_class = IssueSerializer
-    permission_classes = [IsAuthenticated, IsContributor, IsAuthor]
+    permission_classes = [IsAuthenticated, IsAuthor, IsContributor]
+    """
+    Simple class use to get and post new issues
+    User must be the author or a contributor of the project
+    """
 
     def get_queryset(self):
         project_id = self.kwargs.get("project_pk")
@@ -63,6 +86,10 @@ class IssueViewSet(ModelViewSet):
 class CommentViewSet(ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticated, IsContributor, IsAuthor]
+    """
+    Simple class use to get and post new comment
+    User must be the author or a contributor of the project
+    """
 
     def get_queryset(self):
         issue_id = self.kwargs.get("issue_pk")
@@ -72,4 +99,4 @@ class CommentViewSet(ModelViewSet):
     def perform_create(self, serializer: IssueSerializer):
         issue_id = self.kwargs.get("issue_pk")
         issue_object = get_object_or_404(Issue, id=issue_id)
-        serializer.save(user=self.request.user, issue=issue_object)
+        serializer.save(author=self.request.user, issue=issue_object)

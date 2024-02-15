@@ -10,7 +10,7 @@ class Project(models.Model):
         IOS = "I", _("iOS")
         ANDROID = "A", _("Android")
 
-    author = models.ForeignKey(to=User, on_delete=models.DO_NOTHING)
+    author = models.ForeignKey(to=User, null=True, on_delete=models.SET_NULL)
     name = models.CharField(max_length=32)
     description = models.CharField(max_length=2048)
     type = models.CharField(max_length=10, choices=ProjectTypes.choices)
@@ -42,7 +42,7 @@ class Issue(models.Model):
         INP = "I", _("IN PROGRESS")
         FIN = "F", _("FINISHED")
 
-    author = models.ForeignKey(to=User, on_delete=models.DO_NOTHING)
+    author = models.ForeignKey(to=User, null=True, on_delete=models.SET_NULL)
     project = models.ForeignKey(to=Project, on_delete=models.CASCADE)
     time_created = models.DateTimeField(auto_now_add=True)
     priority = models.CharField(max_length=1, choices=Priority.choices)
@@ -51,12 +51,12 @@ class Issue(models.Model):
     title = models.CharField(max_length=56)
     description = models.CharField(max_length=1024)
     attributed_user = models.ForeignKey(
-        to=User, on_delete=models.DO_NOTHING, related_name="attributed"
+        to=User, null=True, on_delete=models.SET_NULL, related_name="attributed"
     )
 
 
 class Comment(models.Model):
-    author = models.ForeignKey(to=User, on_delete=models.DO_NOTHING)
+    author = models.ForeignKey(to=User, null=True, on_delete=models.SET_NULL)
     issue = models.ForeignKey(to=Issue, on_delete=models.CASCADE)
     text = models.CharField(max_length=2048)
     time_created = models.DateTimeField(auto_now_add=True)
