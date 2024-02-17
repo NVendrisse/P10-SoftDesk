@@ -10,13 +10,16 @@ class Project(models.Model):
         IOS = "I", _("iOS")
         ANDROID = "A", _("Android")
 
-    author = models.ForeignKey(to=User, null=True, on_delete=models.SET_NULL)
+    author = models.ForeignKey(to=User, on_delete=models.CASCADE)
     name = models.CharField(max_length=32)
     description = models.CharField(max_length=2048)
     type = models.CharField(max_length=10, choices=ProjectTypes.choices)
     time_created = models.DateTimeField(auto_now_add=True)
     contributors = models.ManyToManyField(
-        to=User, through="contributor", related_name="contributor_list", default=[]
+        to=User,
+        through="contributor",
+        related_name="contributor_list",
+        default=[],
     )
 
 
@@ -42,7 +45,7 @@ class Issue(models.Model):
         INP = "I", _("IN PROGRESS")
         FIN = "F", _("FINISHED")
 
-    author = models.ForeignKey(to=User, null=True, on_delete=models.SET_NULL)
+    author = models.ForeignKey(to=User, on_delete=models.CASCADE)
     project = models.ForeignKey(to=Project, on_delete=models.CASCADE)
     time_created = models.DateTimeField(auto_now_add=True)
     priority = models.CharField(max_length=1, choices=Priority.choices)
@@ -51,12 +54,14 @@ class Issue(models.Model):
     title = models.CharField(max_length=56)
     description = models.CharField(max_length=1024)
     attributed_user = models.ForeignKey(
-        to=User, null=True, on_delete=models.SET_NULL, related_name="attributed"
+        to=User,
+        on_delete=models.CASCADE,
+        related_name="attributed",
     )
 
 
 class Comment(models.Model):
-    author = models.ForeignKey(to=User, null=True, on_delete=models.SET_NULL)
+    author = models.ForeignKey(to=User, on_delete=models.CASCADE)
     issue = models.ForeignKey(to=Issue, on_delete=models.CASCADE)
     text = models.CharField(max_length=2048)
     time_created = models.DateTimeField(auto_now_add=True)
