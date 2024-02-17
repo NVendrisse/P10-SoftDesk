@@ -39,7 +39,7 @@ class ProjectViewSet(ModelViewSet):
 
     def perform_create(self, serializer: ProjectSerializer):
         project = serializer.save(author=self.request.user)
-        contribute = Contributor.objects.create(project=project, user=self.request.user)
+        Contributor.objects.create(project=project, user=self.request.user)
 
 
 class ContributorViewSet(ModelViewSet):

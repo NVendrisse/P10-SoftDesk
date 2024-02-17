@@ -8,9 +8,12 @@ class IsProjectAuthorOrContributorReadOnly(permissions.BasePermission):
     Permission for the project author for project and contributor management
     """
 
+    message = (
+        "Permission denied, you are not the author, or a contributor of this project"
+    )
+
     def has_object_permission(self, request, view, obj):
 
-        message = "Permission denied, you are not the author, or a contributor of this project"
         if view.action == "retrieve":
             contributors = [
                 contrib.user for contrib in Contributor.objects.filter(project=obj)
